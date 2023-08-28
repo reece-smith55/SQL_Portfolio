@@ -1,5 +1,6 @@
 *** Dataset: Video Games from databasestar
 *** Source: https://www.databasestar.com/sample-database-video-games/
+*** Queried using MySQL
 
 -- Display the total number of games that each publisher has created:
 
