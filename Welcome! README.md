@@ -1,4 +1,4 @@
-# SQL_Portfolio
-This repository contains all of my projects using SQL.
-I will be providing businesses cases behind the projects' queries to answer real-world business problems.
-Thanks for checking it out!
+# SQL Portfolio - Reece Smith
+This repository contains all of my individual projects using SQL.
+Thanks for checking it out, and feel free to send me a note with questions or feedback. 
+> [LinkedIn Profile](https://www.linkedin.com/in/reece-smith-mn/)
