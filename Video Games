@@ -1,0 +1,68 @@
+*** Dataset: Video Games from databasestar
+*** Source: https://www.databasestar.com/sample-database-video-games/
+
+-- Display the total number of games that each publisher has created:
+
+SELECT publisher_name, COUNT(game_id) AS total_games
+FROM game_publisher
+JOIN publisher ON game_publisher.publisher_id = publisher.id
+GROUP BY publisher_name
+ORDER BY total_games DESC;
+
+-- Which game publisher has made the most sales per game published?
+
+SELECT publisher_name, 
+    SUM(num_sales) AS total_sales,
+    COUNT(DISTINCT game_id) AS total_games, 
+    SUM(num_sales)/COUNT(DISTINCT game_id) AS sales_per_game
+FROM publisher
+    JOIN game_publisher ON publisher.id = game_publisher.publisher_id
+    JOIN game_platform ON game_publisher.id = game_platform.game_publisher_id
+    JOIN region_sales ON game_platform.id = region_sales.game_platform_id
+GROUP BY publisher_name
+ORDER BY sales_per_game DESC;
+
+-- What are the top 10 best-selling games globally?
+
+SELECT game_name, platform_name, release_year, publisher_name, genre_name, SUM(num_sales) AS global_sales
+FROM region_sales
+    JOIN game_platform ON region_sales.game_platform_id = game_platform.id
+    JOIN platform ON game_platform.platform_id = platform.id
+    JOIN game_publisher ON game_platform.game_publisher_id = game_publisher.id
+    JOIN publisher ON game_publisher.publisher_id = publisher.id
+    JOIN game ON game_publisher.game_id = game.id
+    JOIN genre ON game.genre_id = genre.id
+GROUP BY game_name, platform_name, release_year, publisher_name, genre_name
+ORDER BY global_sales DESC LIMIT 10;
+
+-- Compare the total sales by region of Nintendo vs. Electronic Arts
+
+SELECT region_name,
+    SUM(CASE
+        WHEN publisher_name = 'Nintendo' THEN num_sales END) AS Nintendo_sales,
+    SUM(CASE
+        WHEN publisher_name = 'Electronic Arts' THEN num_sales END) AS EA_sales,
+    SUM(CASE WHEN publisher_name = 'Nintendo' THEN num_sales END) - 
+    SUM(CASE WHEN publisher_name = 'Electronic Arts' THEN num_sales END) AS variance
+FROM region_sales
+    JOIN region ON region.id = region_sales.region_id
+    JOIN game_platform ON game_platform.id = region_sales.game_platform_id
+    JOIN game_publisher ON game_platform.game_publisher_id = game_publisher.id
+    JOIN publisher ON game_publisher.publisher_id = publisher.id
+GROUP BY region_name;
+
+-- Publisher Bethesda is thinking of developing a new game in the Role-Playing genre.
+-- Based on average historical performance, which region should receive the most marketing to boost sales for the new game?
+
+SELECT region_name,
+    SUM(num_sales)/COUNT(DISTINCT game_id) AS avg_sales
+FROM region
+    JOIN region_sales ON region.id = region_sales.region_id
+    JOIN game_platform ON region_sales.game_platform_id = game_platform.id
+    JOIN game_publisher ON game_platform.game_publisher_id = game_publisher.id
+    JOIN publisher ON game_publisher.publisher_id = publisher.id
+    JOIN game ON game_publisher.game_id = game.id
+    JOIN genre ON game.genre_id = genre.id
+WHERE publisher_name = 'Bethesda Softworks' AND genre_name = 'Role-Playing'
+GROUP BY region_name
+ORDER BY avg_sales DESC;
