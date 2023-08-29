@@ -1,4 +1,4 @@
--- Data contains randomly generated data for 385 online orders from 100 global customers ranging from 1/1/2022 - 8/29/2023.
+-- Data contains randomly generated data for 360 online orders from 100 global customers ranging from 1/1/2022 - 8/29/2023.
 -- Data generated using https://generatedata.com/generator
 
 DROP DATABASE IF EXISTS ecommerce;
