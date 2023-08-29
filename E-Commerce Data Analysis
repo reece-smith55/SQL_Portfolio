@@ -1,0 +1,44 @@
+-- Display total number of orders by customer ordered from most to least, including customers that have no orders:
+
+SELECT CONCAT(first_name, ' ', last_name) AS customer_name, COUNT(orders.id) as total_orders
+FROM customers
+LEFT JOIN orders ON orders.customer_id = customers.id
+GROUP BY customer_name
+ORDER BY total_orders DESC;
+
+-- Display the top 5 most popular products in terms of units sold:
+
+SELECT product_name, SUM(quantity) AS units_sold
+FROM products
+JOIN transactions ON products.id = transactions.product_id
+GROUP BY product_name
+ORDER BY units_sold DESC LIMIT 5;
+
+-- Display the top 5 most popular products in terms of revenue:
+
+SELECT product_name, SUM(quantity*price) AS revenue
+FROM products
+JOIN transactions ON products.id = transactions.product_id
+GROUP BY product_name, price
+ORDER BY revenue DESC LIMIT 5;
+
+-- Display the number of units sold and revenue by month in 2022:
+
+SELECT MONTHNAME(order_date) AS month, SUM(quantity) AS units_sold, SUM(quantity*price) AS revenue
+FROM orders
+JOIN transactions ON orders.id = transactions.order_id
+JOIN products ON products.id = transactions.product_id
+WHERE YEAR(order_date) = '2022'
+GROUP BY month
+ORDER BY revenue DESC;
+
+-- Display each customer's most recent order. If their most recent order was over 6 months ago, label them as 'INACTIVE':
+
+SELECT CONCAT(first_name, ' ', last_name) AS customer_name, MAX(order_date) AS most_recent_order, 
+CASE
+    WHEN TIMESTAMPDIFF(MONTH,MAX(order_date),CURDATE()) < 6 THEN 'ACTIVE'
+    ELSE 'INACTIVE'
+    END AS active_status
+FROM customers
+LEFT JOIN orders ON customers.id = orders.customer_id
+GROUP BY customer_name;
