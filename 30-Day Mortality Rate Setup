@@ -1,0 +1,42 @@
+-- Original Dataset: https://www.kaggle.com/datasets/thedevastator/us-healthcare-readmissions-and-mortality
+-- Dataset contains information about 30-day readmission and mortality rates of U.S. hospitals. The data comes from studies taken from 7/1/2012 - 6/30/2015.
+-- I cleaned the dataset before loading the data via CSV by performing the following:
+    -- Removed all rows with unavailable data and footnotes.
+    -- Removed all rows outside of the 7/1/2012 - 6/30/2015 measurement range.
+    -- Removed the 'Location' feature to limit redundant data.
+    -- Changed the 'Compared to National' feature to the national average of that measurement (integer) and added as a dimension to the 'measure' table.
+    -- All primary key ID columns were changed to auto-incremented integers.
+
+DROP DATABASE IF EXISTS healthcare-readmissions;
+CREATE DATABASE healthcare_readmissions;
+USE healthcare_readmissions;
+
+CREATE TABLE provider(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    hospital_name VARCHAR(200) NOT NULL,
+    street_address VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    state CHAR(2) NOT NULL,
+    zip CHAR(5) NOT NULL,
+    county VARCHAR(50) NOT NULL,
+    phone_number CHAR(10) NOT NULL
+    );
+
+CREATE TABLE measure(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    measure_abbr VARCHAR(50) NOT NULL,
+    measure_name VARCHAR(200) NOT NULL,
+    national_avg_score DECIMAL (3,1) NOT NULL
+    );
+
+CREATE TABLE study(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    provider_id INT NOT NULL,
+    measure_id INT NOT NULL,
+    patients INT NOT NULL,
+    score DECIMAL(3,1) NOT NULL,
+    low_estimate DECIMAL(3,1) NOT NULL,
+    high_estimate DECIMAL(3,1) NOT NULL,
+    FOREIGN KEY (provider_id) REFERENCES provider(id),
+    FOREIGN KEY (measure_id) REFERENCES measure(id)
+    );
