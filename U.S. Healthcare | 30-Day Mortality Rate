@@ -40,3 +40,42 @@ CREATE TABLE study(
     FOREIGN KEY (provider_id) REFERENCES provider(id),
     FOREIGN KEY (measure_id) REFERENCES measure(id)
     );
+
+-- QUERIES:
+
+-- Display the 10 states/territories with the highest (worst) average scores in mortality rate for COPD patients:
+
+SELECT state, AVG(score) AS avg_score
+FROM provider
+JOIN study ON provider.id = study.provider_id
+WHERE measure_id = 3
+GROUP BY state
+ORDER BY avg_score DESC;
+
+-- Display each hospital in the state of Minnesota that performed a heart-failure mortality study
+-- and indicate if its score is better or worse than the national average:
+
+SELECT hospital_name, score,
+CASE
+    WHEN score > (SELECT national_avg_score FROM measure WHERE measure.id = 4) THEN 'WORSE'
+    ELSE 'BETTER'
+    END AS comp_to_natl_avg
+FROM provider
+JOIN study ON provider.id = study.provider_id
+WHERE state = 'MN' AND measure_id = 4
+ORDER BY score DESC;
+
+-- Display which states had the largest range between heart failure mortality score estimates, on average:
+
+SELECT state, (AVG(high_estimate) - AVG(low_estimate)) AS avg_estimate_range
+FROM provider
+JOIN study ON provider.id = study.provider_id
+WHERE measure_id = 4
+GROUP BY state
+ORDER BY avg_estimate_range DESC;
+
+-- *** Visualizations for this dataset available on my Tableau Public profile (link in README.md file) ***
+
+
+
+
