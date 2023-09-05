@@ -52,6 +52,15 @@ WHERE measure_id = 3
 GROUP BY state
 ORDER BY avg_score DESC;
 
+-- Display which states had the largest range between heart failure mortality score estimates, on average:
+
+SELECT state, (AVG(high_estimate) - AVG(low_estimate)) AS avg_estimate_range
+FROM provider
+JOIN study ON provider.id = study.provider_id
+WHERE measure_id = 4
+GROUP BY state
+ORDER BY avg_estimate_range DESC;
+
 -- Display each hospital in the state of Minnesota that performed a heart-failure mortality study
 -- and indicate if its score is better or worse than the national average:
 
@@ -65,16 +74,39 @@ JOIN study ON provider.id = study.provider_id
 WHERE state = 'MN' AND measure_id = 4
 ORDER BY score DESC;
 
--- Display which states had the largest range between heart failure mortality score estimates, on average:
+-- Display the average mortality rate and readmission rate for each measure by state. Do states that have higher readmission rates
+-- also have higher mortality rates?
 
-SELECT state, (AVG(high_estimate) - AVG(low_estimate)) AS avg_estimate_range
+SELECT state,
+AVG(CASE
+    WHEN measure_id = 1 THEN score END) AS AMI_Mortality,
+AVG(CASE
+    WHEN measure_id = 7 THEN score END) AS AMI_Readmit,
+AVG(CASE
+    WHEN measure_id = 2 THEN score END) AS CABG_Mortality,
+AVG(CASE
+    WHEN measure_id = 8 THEN score END) AS CABG_Readmit,
+AVG(CASE
+    WHEN measure_id = 3 THEN score END) AS COPD_Mortality,
+AVG(CASE
+    WHEN measure_id = 9 THEN score END) AS COPD_Readmit,
+AVG(CASE
+    WHEN measure_id = 4 THEN score END) AS HF_Mortality,
+AVG(CASE
+    WHEN measure_id = 10 THEN score END) AS HF_Readmit,
+AVG(CASE
+    WHEN measure_id = 5 THEN score END) AS PN_Mortality,
+AVG(CASE
+    WHEN measure_id = 12 THEN score END) AS PN_Readmit,
+AVG(CASE
+    WHEN measure_id = 6 THEN score END) AS STK_Mortality,
+AVG(CASE
+    WHEN measure_id = 13 THEN score END) AS STK_Readmit
 FROM provider
 JOIN study ON provider.id = study.provider_id
-WHERE measure_id = 4
-GROUP BY state
-ORDER BY avg_estimate_range DESC;
+GROUP BY state;
 
--- *** Visualizations for this dataset available on my Tableau Public profile (link in README.md file) ***
+-- * Visualizations and Dashboards for this dataset are available on my Tableau Public profile (link in README.md file) *
 
 
 
