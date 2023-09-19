@@ -1,0 +1,68 @@
+-- Original Dataset: https://www.kaggle.com/datasets/fatihb/coffee-quality-data-cqi
+-- The dataset contains coffee production and taste evaluation information for producers from all over the world. Data accumulated by the Coffee Quality Institute (CQI).
+-- Cleaning:
+  -- I removed all rows that contained null rating information as that is my target variable for most of my queries.
+  -- I removed columns with redundant and non-useful information.
+  -- All primary key ID columns were changed to auto-incremented integers
+-- Data was imported via CSV file.
+
+DROP DATABASE IF EXISTS coffee;
+CREATE DATABASE coffee;
+USE coffee;
+
+CREATE TABLE country(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    country_name VARCHAR(50) NOT NULL
+    );
+
+CREATE TABLE farm(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    farm_name VARCHAR(300),
+    altitude INT,
+    country_id INT NOT NULL,
+    FOREIGN KEY (country_id) REFERENCES country(id)
+    );
+
+CREATE TABLE company(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    company_name VARCHAR(50)
+    );
+
+CREATE TABLE lot(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    lot_name VARCHAR(200)
+    );
+
+CREATE TABLE certification(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    cert_body VARCHAR(500),
+    cert_address VARCHAR(500),
+    cert_contact VARCHAR(500)
+    );
+
+CREATE TABLE evaluation(
+    id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    farm_id INT,
+    lot_id INT,
+    company_id INT,
+    cert_id INT,
+    variety VARCHAR(300),
+    processing_method VARCHAR(300),
+    aroma DECIMAL(3,2),
+    flavor DECIMAL(3,2),
+    aftertaste DECIMAL(3,2),
+    acidity DECIMAL(3,2),
+    body DECIMAL(3,2),
+    balance DECIMAL(3,2),
+    uniformity DECIMAL(3,1),
+    clean_cup DECIMAL(3,1),
+    sweetness DECIMAL(3,1),
+    overall DECIMAL(3,2),
+    moisture_percent DECIMAL(3,1),
+    cat_one_defects INT,
+    cat_two_defects INT,
+    FOREIGN KEY (farm_id) REFERENCES farm(id),
+    FOREIGN KEY (lot_id) REFERENCES lot(id),
+    FOREIGN KEY (company_id) REFERENCES company(id),
+    FOREIGN KEY (cert_id) REFERENCES certification(id)
+    );
