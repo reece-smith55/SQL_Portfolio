@@ -1,0 +1,56 @@
+-- Display average overall score by country from highest to lowest for countries with 3 or more evaluations:
+
+SELECT country_name, AVG(overall) AS avg_score
+FROM evaluation
+JOIN farm ON evaluation.farm_id = farm.id
+JOIN country ON farm.country_id = country.id
+GROUP BY country_name
+HAVING COUNT(evaluation.id) >= 3
+ORDER BY avg_score DESC;
+
+-- Categorize each farm into low (<=1000), medium (1001-1500), and high (>1500) elevations.
+
+SELECT farm_name, altitude, 
+CASE
+    WHEN altitude <= 1000 THEN 'Low'
+    WHEN altitude > 1000 AND altitude <= 1500 THEN 'Medium'
+    ELSE 'High'
+END AS elevation
+FROM farm;
+
+-- Which elevation has the highest average overall rating?
+
+SELECT CASE
+    WHEN altitude <= 1000 THEN 'Low'
+    WHEN altitude > 1000 AND altitude <= 1500 THEN 'Medium'
+    ELSE 'High'
+END AS elevation, AVG(overall) AS avg_score
+FROM evaluation
+JOIN farm ON evaluation.farm_id = farm.id
+GROUP BY elevation
+ORDER BY avg_score DESC;
+
+-- Display the farm name, elevation (Low/Med/High), overall rating, average overall rating for all farms in that elevation,
+-- and the variance to elevation average for each evaluation:
+
+SELECT farm_name, country_name, 
+CASE
+    WHEN altitude <= 1000 THEN 'Low'
+    WHEN altitude > 1000 AND altitude <= 1500 THEN 'Medium'
+    ELSE 'High'
+    END AS elevation,
+overall AS rating,
+AVG(overall)OVER(PARTITION BY CASE
+    WHEN altitude <= 1000 THEN 'Low'
+    WHEN altitude > 1000 AND altitude <= 1500 THEN 'Medium'
+    ELSE 'High'
+    END) AS elevation_avg_rating,
+overall - AVG(overall)OVER(PARTITION BY CASE
+    WHEN altitude <= 1000 THEN 'Low'
+    WHEN altitude > 1000 AND altitude <= 1500 THEN 'Medium'
+    ELSE 'High'
+    END) AS variance_to_average
+FROM evaluation
+JOIN farm ON evaluation.farm_id = farm.id
+JOIN country ON farm.country_id = country.id
+ORDER BY elevation, variance_to_average DESC;
