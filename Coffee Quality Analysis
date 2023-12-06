@@ -54,3 +54,9 @@ FROM evaluation
 JOIN farm ON evaluation.farm_id = farm.id
 JOIN country ON farm.country_id = country.id
 ORDER BY elevation, variance_to_average DESC;
+
+-- Display all information in the farm table for all farms that have 2 words in their name:
+
+SELECT *
+FROM farm
+WHERE REGEXP_LIKE(farm_name, '^[:alpha:]+ [:alpha:]+$');
