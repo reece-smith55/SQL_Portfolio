@@ -106,6 +106,12 @@ FROM provider
 JOIN study ON provider.id = study.provider_id
 GROUP BY state;
 
+-- Display all provider information for hospitals with a cardinal direction in their name:
+
+SELECT *
+FROM provider
+WHERE REGEXP_LIKE(hospital_name, '(NORTH|SOUTH|EAST|WEST)')
+
 -- * Visualizations and Dashboards for this dataset are available on my Tableau Public profile (link in README.md file) *
 
 
